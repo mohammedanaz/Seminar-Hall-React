@@ -1,0 +1,34 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 10px;
+}
+
+.grid-item {
+    position: relative;
+    padding-top: 70%;
+    overflow: hidden;
+}
+
+.grid-item .btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media(max-width:576px){
+    .grid-container {
+        gap: 0.2rem; 
+        padding: 0.5rem;
+    }
+    .grid-item .btn {
+        font-size: xx-small;
+    }
+}
