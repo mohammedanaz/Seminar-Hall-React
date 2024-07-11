@@ -60,7 +60,9 @@ export default function CalendarComp() {
         align-items-center py-3'>
         <div className='d-flex flex-column flex-md-row justify-content-center 
           align-items-center flex-grow-1 mb-4 mb-md-0 border border-3 p-4 rounded-4 mx-md-1'>
-          <label htmlFor="date">Select Date: </label><br />
+          <label htmlFor="date" className='fs-4'>
+            Select Date:&nbsp;&nbsp;
+          </label><br />
           <DatePicker className='form-control' 
           id='date'
           dateFormat= "dd/MM/yyyy"
