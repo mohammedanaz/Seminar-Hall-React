@@ -1,27 +1,36 @@
 import { createSlice, current } from "@reduxjs/toolkit";
 
-const today = new Date()
+const today = new Date().toISOString().split('T')[0];
 const seatNumbersArray = Array.from({ length: 30 }, (_, i) => ({
     seatNumber: i + 1, 
     clicked: false,
     isBooked: false
 }))
 const initialState = {
-    selectedDate: today.toDateString(),
+    selectedDate: today,
     seatNumbers: seatNumbersArray,
     bookedData: [],
+    accessToken: null,
+    refreshToken: null,
+    isAuthenticated: false,
 }
 
 const seminarHallSlice = createSlice({
     name: 'seminarHall',
     initialState,
     reducers: {
+        initializeDate: (state) => {
+            console.log('inside initialize date reducer.');
+            state.selectedDate = today;
+        },
+        loadBookedData: (state, action) => {
+            console.log('loadBookedData reducer called.');
+            state.bookedData = action.payload
+        },
         refreshSeats: (state)=>{
-            console.log('refresh Seats called');
-            const filteredData = state.bookedData.filter(seat=> seat.date === state.selectedDate)
-            const bookedSeatsOnDate = filteredData.reduce((acc, item)=>{
-                return [...acc, ...item.seats]
-            },[])
+            console.log('refresh Seats reducer called');
+            const filteredData = state.bookedData.filter(seat=> seat.bookedDate === state.selectedDate)
+            const bookedSeatsOnDate = filteredData.map(item => item.seats).flat();
             const seatNumbersArray = Array.from({ length: 30 }, (_, i) => ({
                 seatNumber: i + 1, 
                 clicked: false,
@@ -36,34 +45,50 @@ const seminarHallSlice = createSlice({
             state.seatNumbers = action.payload
         },
         createBooking: (state, action)=>{
-            console.log('create booking called');
+            console.log('create booking reducer called');
             const {
-                selectedSeats, 
+                seats, 
                 selectedDate,
                 name,
                 phoneNumber
             } = action.payload
-            const seats = selectedSeats.map(seat=> seat.seatNumber)
-            state.bookedData.push({
-                date: selectedDate, 
-                seats: seats,
+
+            state.bookedData.push({ 
                 name: name,
-                phoneNumber: phoneNumber
+                phoneNumber: phoneNumber.toString(),
+                bookedDate: selectedDate,
+                seats: seats
             })
             window.alert(`Booking successfully completed.
                 Details are:-
                 Name- ${name}
                 Phone Number - ${phoneNumber}
+                Booked Date - ${selectedDate}
                 Seats Booked- ${seats}`)  
+        },
+        loginSuccess: (state, action) => {
+            state.accessToken = action.payload.access;
+            state.refreshToken = action.payload.refresh;
+            state.isAuthenticated = true;
+        },
+        logout: (state) => {
+            console.log('inside logout reducer');
+            state.accessToken = null;
+            state.refreshToken = null;
+            state.isAuthenticated = false;
         }
     }
 })
 
 export const {
+    initializeDate,
+    loadBookedData,
     seatClicked,
     createBooking,
     refreshSeats,
-    changeSelectedDate
+    changeSelectedDate,
+    loginSuccess,
+    logout
 } = seminarHallSlice.actions;
 
 export default seminarHallSlice.reducer;

@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import './LoginPage.css'
+import { loginSuccess } from '../../Slices/Slice';
 
 
 export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     function handleUsernameInput(e){
         setUsername(e.target.value)
@@ -13,9 +18,24 @@ export default function LoginPage() {
     function handlePasswordInput(e){
         setPassword(e.target.value)
     }
-    function handleLogin(){
-        
+
+    async function handleLogin() {
+        const userData = {
+            username: username,
+            password: password,
+        };
+
+        try {
+            const response = await axios.post('http://localhost:8000/login/', userData);
+
+            const { access, refresh } = response.data.tokens;
+            dispatch(loginSuccess({ access, refresh }));
+            navigate('/home');
+        } catch (error) {
+            window.alert(`Error - ${error.response.data.detail}`);
+        }
     }
+    
   return (
     <div className='parentDiv d-flex justify-content-center align-items-center vh-100'>
         <div className='col-10 col-md-6 h-50 bg-info-subtle rounded-5 p-4'>
@@ -36,7 +56,7 @@ export default function LoginPage() {
                 Login
             </button>
             <p>To sign up please 
-                <span><Link to=''> Click Here</Link></span>
+                <span><Link to='/signup'> Click Here</Link></span>
             </p>
         </div>
     </div>

@@ -20,7 +20,7 @@ export default function SignUpPage() {
         setConfirmPassword(e.target.value)
     }
 
-      async function handleCreateUser() {
+    async function handleCreateUser() {
     if (password !== confirmPassword) {
       alert('Passwords do not match.');
       return;
@@ -34,14 +34,16 @@ export default function SignUpPage() {
     try {
       const response = await axios.post('http://localhost:8000/signup/', userData);
       
-      console.log('Signup successful:', response.data);
-      window.alert('User successfully created. Please login.')
+      console.log('response data- ', response.data);
+      const username = response.data.user.username
+      window.alert(`User successfully created with Username - ${username}. Please login.`)
       navigate('/login')
       setUsername('')
       setPassword('')
       setConfirmPassword('')
     } catch (error) {
       console.error('Error signing up:', error.response.data);
+      window.alert(`Error is - ${error.response.data.username}`)
     }
   }
 
@@ -70,7 +72,7 @@ export default function SignUpPage() {
                 Creat Account
             </button>
             <p>If existing user please  
-                <span><Link to=''> Click Here to login</Link></span>
+                <span><Link to='/login'> Click Here to login</Link></span>
             </p>
         </div>
     </div>

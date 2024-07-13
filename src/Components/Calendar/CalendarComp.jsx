@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useDispatch, useSelector } from 'react-redux'
-import {createBooking, refreshSeats, changeSelectedDate} from '../../Slices/Slice'
+import {
+  createBooking, 
+  refreshSeats, 
+  changeSelectedDate, 
+  initializeDate,
+  loadBookedData
+} from '../../Slices/Slice'
+import axios from 'axios';
 
 
 export default function CalendarComp() {
@@ -14,8 +21,32 @@ export default function CalendarComp() {
   const bookedData = useSelector(state=> state.seminarHall.bookedData)
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    console.log('use effect didMount only inside calendar comp');
+
+    async function fetchBookedData(){
+      try {
+        const response = await axios.get('http://localhost:8000/fetch_booking/');
+        const fetchedData = response.data.map(item=> ({
+          name: item.name,
+          phoneNumber: item.phone_number,
+          bookedDate: item.booked_date,
+          seats: item.seats
+        }));
+        dispatch(loadBookedData(fetchedData));
+
+        console.log('fetched data is - ', fetchedData);
+      } catch (error) {
+        console.log('Error while fetching booked data - ', error.response.data);
+      }
+    }
+
+    dispatch(initializeDate());
+    fetchBookedData();
+  }, []);
+
   useEffect(()=>{
-    console.log('use effect inside calendar comp');
+    console.log('use effect to refresh seat inside calendar comp');
     dispatch(refreshSeats())
     },[selectedDate, bookedData])
 
@@ -26,32 +57,52 @@ export default function CalendarComp() {
     setinputPhoneNumber(e.target.value)
   }
   function handleDateChange(date){
-    const today = new Date()
-    today.setHours(0,0,0,0);
-    if (date < today){
+    const formattedDate = date.toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        if (formattedDate < today) {
       window.alert('cannot select past dates.')
       return
     }
-    dispatch(changeSelectedDate(date.toDateString()))
+    dispatch(changeSelectedDate(formattedDate));
   }
-  function handleBooking(){
-    if(inputName === '' || inputPhoneNumber === null){
-      window.alert('Either Name or Phone number not entered.')
-      return
+
+  async function handleBooking() {
+    console.log('inside handle booking');
+    if (inputName === '' || inputPhoneNumber === '') {
+        window.alert('Either Name or Phone number not entered.');
+        return;
     }
-    const selectedSeats = seatNumbers.filter(seat=> seat.clicked === true && seat.isBooked === false)
-    if (selectedSeats.length === 0){
-      window.alert('No seats selected.')
-      return
+    const selectedSeats = seatNumbers.filter(seat => seat.clicked === true && seat.isBooked === false);
+
+    if (selectedSeats.length === 0) {
+        window.alert('No seats selected.');
+        return;
     }
-    dispatch(createBooking({
-      selectedSeats: selectedSeats, 
-      selectedDate: selectedDate,
-      name: inputName,
-      phoneNumber: inputPhoneNumber
-    }))
-    setInputName('')
-    setinputPhoneNumber('')
+
+    const seats = selectedSeats.map(seat => seat.seatNumber);
+
+    try {
+        const response = await axios.post('http://localhost:8000/bookings/create/', {
+            name: inputName,
+            phoneNumber: inputPhoneNumber,
+            bookedDate: selectedDate,
+            seats: seats
+        });
+
+        console.log('booking created success.');
+        dispatch(createBooking({
+            seats: seats,
+            selectedDate: selectedDate,
+            name: inputName,
+            phoneNumber: inputPhoneNumber
+        }));
+
+        setInputName('');
+        setinputPhoneNumber('');
+    } catch (error) {
+        console.error('Error creating booking:', error);
+        window.alert('Error creating booking. Please try again.');
+    }
   }
   return (
     <div className='mb-4'>
@@ -65,9 +116,9 @@ export default function CalendarComp() {
           </label><br />
           <DatePicker className='form-control' 
           id='date'
-          dateFormat= "dd/MM/yyyy"
-          selected={selectedDate}
-          placeholderText='Click to select a date'
+          dateFormat="yyyy-MM-dd"
+          selected={new Date(selectedDate)} 
+          placeholderText='Click to select a date' 
           onChange={handleDateChange}
           />
         </div>
@@ -95,3 +146,24 @@ export default function CalendarComp() {
     </div>
   )
 }
+
+
+ // function handleBooking(){
+  //   if(inputName === '' || inputPhoneNumber === null){
+  //     window.alert('Either Name or Phone number not entered.')
+  //     return
+  //   }
+  //   const selectedSeats = seatNumbers.filter(seat=> seat.clicked === true && seat.isBooked === false)
+  //   if (selectedSeats.length === 0){
+  //     window.alert('No seats selected.')
+  //     return
+  //   }
+  //   dispatch(createBooking({
+  //     selectedSeats: selectedSeats, 
+  //     selectedDate: selectedDate,
+  //     name: inputName,
+  //     phoneNumber: inputPhoneNumber
+  //   }))
+  //   setInputName('')
+  //   setinputPhoneNumber('')
+  // }
