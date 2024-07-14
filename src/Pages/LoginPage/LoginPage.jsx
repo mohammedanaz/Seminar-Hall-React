@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import './LoginPage.css'
 import { loginSuccess } from '../../Slices/Slice';
+import { seminarHallAxios } from '../../axiosInterceptors';
 
 
 export default function LoginPage() {
@@ -26,7 +27,7 @@ export default function LoginPage() {
         };
 
         try {
-            const response = await axios.post('http://localhost:8000/login/', userData);
+            const response = await seminarHallAxios.post('/login/', userData);
 
             const { access, refresh } = response.data.tokens;
             dispatch(loginSuccess({ access, refresh }));

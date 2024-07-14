@@ -2,10 +2,14 @@ import axios from 'axios';
 import {store} from './store'
 import { loginSuccess, logout } from './Slices/Slice';
 
-axios.defaults.baseURL = 'http://localhost:8000';
+//axios.defaults.baseURL = 'http://localhost:8000';
+
+export const seminarHallAxios = axios.create({
+    baseURL: 'http://localhost:8000',
+  });
 
 // Intercept requests to attach the access token on request header.
-axios.interceptors.request.use(
+seminarHallAxios.interceptors.request.use(
     async (config) => {
         console.log('inside req interceptor');
         const state = store.getState();
@@ -23,7 +27,7 @@ axios.interceptors.request.use(
 );
 
 // Intercept responses to handle token refresh
-axios.interceptors.response.use(
+seminarHallAxios.interceptors.response.use(
     (response) => {
         console.log('inside success response  interceptor');
         return response;
@@ -41,7 +45,7 @@ axios.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    const response = await axios.post('/api/token/refresh/', { refresh: refreshToken });
+                    const response = await seminarHallAxios.post('/api/token/refresh/', { refresh: refreshToken });
                     const { access } = response.data;
 
                     store.dispatch(loginSuccess({ access: access, refresh: refreshToken }));

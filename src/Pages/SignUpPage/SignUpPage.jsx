@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
+import { seminarHallAxios } from '../../axiosInterceptors';
 
 
 export default function SignUpPage() {
@@ -32,7 +33,7 @@ export default function SignUpPage() {
     };
 
     try {
-      const response = await axios.post('http://localhost:8000/signup/', userData);
+      const response = await seminarHallAxios.post('/signup/', userData);
       
       console.log('response data- ', response.data);
       const username = response.data.user.username

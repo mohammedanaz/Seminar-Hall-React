@@ -10,6 +10,7 @@ import {
   loadBookedData
 } from '../../Slices/Slice'
 import axios from 'axios';
+import { seminarHallAxios } from '../../axiosInterceptors'
 
 
 export default function CalendarComp() {
@@ -26,7 +27,7 @@ export default function CalendarComp() {
 
     async function fetchBookedData(){
       try {
-        const response = await axios.get('http://localhost:8000/fetch_booking/');
+        const response = await seminarHallAxios.get('http://localhost:8000/fetch_booking/');
         const fetchedData = response.data.map(item=> ({
           name: item.name,
           phoneNumber: item.phone_number,
@@ -82,7 +83,7 @@ export default function CalendarComp() {
     const seats = selectedSeats.map(seat => seat.seatNumber);
 
     try {
-        const response = await axios.post('http://localhost:8000/bookings/create/', {
+        const response = await seminarHallAxios.post('http://localhost:8000/bookings/create/', {
             name: inputName,
             phoneNumber: inputPhoneNumber,
             bookedDate: selectedDate,
@@ -146,24 +147,3 @@ export default function CalendarComp() {
     </div>
   )
 }
-
-
- // function handleBooking(){
-  //   if(inputName === '' || inputPhoneNumber === null){
-  //     window.alert('Either Name or Phone number not entered.')
-  //     return
-  //   }
-  //   const selectedSeats = seatNumbers.filter(seat=> seat.clicked === true && seat.isBooked === false)
-  //   if (selectedSeats.length === 0){
-  //     window.alert('No seats selected.')
-  //     return
-  //   }
-  //   dispatch(createBooking({
-  //     selectedSeats: selectedSeats, 
-  //     selectedDate: selectedDate,
-  //     name: inputName,
-  //     phoneNumber: inputPhoneNumber
-  //   }))
-  //   setInputName('')
-  //   setinputPhoneNumber('')
-  // }
