@@ -4,7 +4,7 @@ import './Header.css'
 import { logout } from '../../Slices/Slice'
 import { useDispatch } from 'react-redux'
 
-export default function Header({username}) {
+export default function Header() {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -17,7 +17,7 @@ export default function Header({username}) {
     <div className='header d-flex justify-content-center align-items-center'>
         <div className='d-flex justify-content-between col-10 col-md-6 border rounded-3'>
           <h2 className='headerText mx-4 text-white'>
-            Welcome - {username ? username : 'Guest'}
+            Welcome
           </h2>
           <button className='btn'
           onClick={handleLogout}>

@@ -1,12 +1,8 @@
 import axios from 'axios';
 import {store} from './store'
 import { loginSuccess, logout } from './Slices/Slice';
+import { seminarHallAxios } from './Api/axiosSeminarHall';
 
-//axios.defaults.baseURL = 'http://localhost:8000';
-
-export const seminarHallAxios = axios.create({
-    baseURL: 'http://localhost:8000',
-  });
 
 // Intercept requests to attach the access token on request header.
 seminarHallAxios.interceptors.request.use(

@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
 import './LoginPage.css'
 import { loginSuccess } from '../../Slices/Slice';
-import { seminarHallAxios } from '../../axiosInterceptors';
+import login from '../../Api/login';
 
 
 export default function LoginPage() {
@@ -27,7 +26,7 @@ export default function LoginPage() {
         };
 
         try {
-            const response = await seminarHallAxios.post('/login/', userData);
+            const response = await login(userData);
 
             const { access, refresh } = response.data.tokens;
             dispatch(loginSuccess({ access, refresh }));

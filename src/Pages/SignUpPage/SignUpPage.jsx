@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios';
-import { seminarHallAxios } from '../../axiosInterceptors';
+import signup from '../../Api/signup'
+
 
 
 export default function SignUpPage() {
@@ -33,9 +33,8 @@ export default function SignUpPage() {
     };
 
     try {
-      const response = await seminarHallAxios.post('/signup/', userData);
+      const response = await signup(userData);
       
-      console.log('response data- ', response.data);
       const username = response.data.user.username
       window.alert(`User successfully created with Username - ${username}. Please login.`)
       navigate('/login')

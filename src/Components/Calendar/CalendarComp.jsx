@@ -9,8 +9,8 @@ import {
   initializeDate,
   loadBookedData
 } from '../../Slices/Slice'
-import axios from 'axios';
-import { seminarHallAxios } from '../../axiosInterceptors'
+import fetchBookedData from '../../Api/fetchBookedData'
+import axiosCreateBooking from '../../Api/axiosCeateBooking'
 
 
 export default function CalendarComp() {
@@ -25,9 +25,9 @@ export default function CalendarComp() {
   useEffect(() => {
     console.log('use effect didMount only inside calendar comp');
 
-    async function fetchBookedData(){
+    async function getBookedData(){
       try {
-        const response = await seminarHallAxios.get('http://localhost:8000/fetch_booking/');
+        const response = await fetchBookedData();
         const fetchedData = response.data.map(item=> ({
           name: item.name,
           phoneNumber: item.phone_number,
@@ -38,12 +38,12 @@ export default function CalendarComp() {
 
         console.log('fetched data is - ', fetchedData);
       } catch (error) {
-        console.log('Error while fetching booked data - ', error.response.data);
+        console.log('Error while fetching booked data - ', error);
       }
     }
 
     dispatch(initializeDate());
-    fetchBookedData();
+    getBookedData();
   }, []);
 
   useEffect(()=>{
@@ -81,14 +81,15 @@ export default function CalendarComp() {
     }
 
     const seats = selectedSeats.map(seat => seat.seatNumber);
+    const newData = {
+          name: inputName,
+          phoneNumber: inputPhoneNumber,
+          bookedDate: selectedDate,
+          seats: seats
+      }
 
     try {
-        const response = await seminarHallAxios.post('http://localhost:8000/bookings/create/', {
-            name: inputName,
-            phoneNumber: inputPhoneNumber,
-            bookedDate: selectedDate,
-            seats: seats
-        });
+        const response = await axiosCreateBooking(newData);
 
         console.log('booking created success.');
         dispatch(createBooking({
