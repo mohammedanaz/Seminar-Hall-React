@@ -38,7 +38,7 @@ export default function LoginPage() {
             setIsLoading(false)
             setTimeout(() => {
                 window.alert(`Error - ${error.response.data.detail}`);
-            }, 0);
+            }, 100);
         }finally{
             setIsLoading(false)
         }
