@@ -59,12 +59,6 @@ const seminarHallSlice = createSlice({
                 bookedDate: selectedDate,
                 seats: seats
             })
-            window.alert(`Booking successfully completed.
-                Details are:-
-                Name- ${name}
-                Phone Number - ${phoneNumber}
-                Booked Date - ${selectedDate}
-                Seats Booked- ${seats}`)  
         },
         loginSuccess: (state, action) => {
             state.accessToken = action.payload.access;

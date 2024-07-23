@@ -11,12 +11,14 @@ import {
 } from '../../Slices/Slice'
 import fetchBookedData from '../../Api/fetchBookedData'
 import axiosCreateBooking from '../../Api/axiosCeateBooking'
+import { ClipLoader } from 'react-spinners'
 
 
 export default function CalendarComp() {
 
   const [inputName, setInputName] = useState('')
   const [inputPhoneNumber, setinputPhoneNumber] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const selectedDate = useSelector(state=> state.seminarHall.selectedDate)
   const seatNumbers = useSelector(state=> state.seminarHall.seatNumbers)
   const bookedData = useSelector(state=> state.seminarHall.bookedData)
@@ -88,9 +90,9 @@ export default function CalendarComp() {
           seats: seats
       }
 
-    try {
+      try {
+        setIsLoading(true);
         const response = await axiosCreateBooking(newData);
-
         console.log('booking created success.');
         dispatch(createBooking({
             seats: seats,
@@ -98,12 +100,26 @@ export default function CalendarComp() {
             name: inputName,
             phoneNumber: inputPhoneNumber
         }));
-
         setInputName('');
         setinputPhoneNumber('');
+        setIsLoading(false);
+
+        // Use a larger timeout to ensure state update is complete before alert msg
+        setTimeout(() => {
+          window.alert(`Booking successfully completed.
+              Details are:-
+              Name- ${inputName}
+              Phone Number - ${inputPhoneNumber}
+              Booked Date - ${selectedDate}
+              Seats Booked- ${seats}`);
+        }, 200);
+
     } catch (error) {
+      setIsLoading(false)
         console.error('Error creating booking:', error);
-        window.alert('Error creating booking. Please try again.');
+        setTimeout(() => {
+          window.alert('Error creating booking. Please try again.');
+      }, 200);
     }
   }
   return (
@@ -141,7 +157,7 @@ export default function CalendarComp() {
           <button className='btn btn-primary mx-md-2 w-50'
             onClick={handleBooking}
             >
-            Book
+            {isLoading? <ClipLoader size={18}/> :'Book'}
           </button>
         </div>
       </div>

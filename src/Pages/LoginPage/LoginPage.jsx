@@ -4,11 +4,13 @@ import { useDispatch } from 'react-redux';
 import './LoginPage.css'
 import { loginSuccess } from '../../Slices/Slice';
 import login from '../../Api/login';
+import { ClipLoader } from 'react-spinners';
 
 
 export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -26,19 +28,33 @@ export default function LoginPage() {
         };
 
         try {
+            setIsLoading(true)
             const response = await login(userData);
 
             const { access, refresh } = response.data.tokens;
             dispatch(loginSuccess({ access, refresh }));
             navigate('/home');
         } catch (error) {
-            window.alert(`Error - ${error.response.data.detail}`);
+            setIsLoading(false)
+            setTimeout(() => {
+                window.alert(`Error - ${error.response.data.detail}`);
+            }, 0);
+        }finally{
+            setIsLoading(false)
         }
     }
     
   return (
     <div className='parentDiv d-flex justify-content-center align-items-center vh-100'>
-        <div className='col-10 col-md-6 h-50 bg-info-subtle rounded-5 p-4'>
+        {isLoading ? 
+            (
+                <div className='d-flex justify-content-center align-items-center
+                col-10 col-md-6 h-50 bg-info-subtle rounded-5 p-4'>
+                    Loading...<ClipLoader size={50} color={"#123abc"} />
+                </div>
+            ) :
+            (
+                <div className='col-10 col-md-6 h-50 bg-info-subtle rounded-5 p-4'>
             <h2 className='text-center'>Login Page</h2>
             <input type="text" className='form-control mb-4'
                 placeholder='Enter User Name' 
@@ -59,6 +75,8 @@ export default function LoginPage() {
                 <span><Link to='/signup'> Click Here</Link></span>
             </p>
         </div>
+            )
+        }
     </div>
   )
 }
